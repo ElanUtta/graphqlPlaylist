@@ -6,7 +6,7 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 
 
-const uri = "mongodb+srv://elan:12345@cluster0-k6auz.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://elan:@cluster0-k6auz.gcp.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect(err => {
