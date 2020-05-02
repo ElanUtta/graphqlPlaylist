@@ -1,5 +1,6 @@
 const client = require('../app')
 const assert = require('assert');
+const ObjectID = require('mongodb').ObjectID
 
 
 const insertDoc = async (data) => {
@@ -13,7 +14,7 @@ const insertDoc = async (data) => {
 
 const FindById = async (id) => {
     try {
-        return client.db.collection('author').findOne({ _id: id })
+        return await client.db.collection('author').findOne({ "_id": ObjectID(id) }).then(re => re)
     } catch (err) {
         console.log(`Error ao procurar Author: ${err}`)
     }

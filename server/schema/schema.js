@@ -27,14 +27,18 @@ var authors = [
 const BookType = new GraphQLObjectType({
     name: 'Book',
     fields: () => ({
-        id: { type: GraphQLID },
+        _id: { type: GraphQLID },
         name: { type: GraphQLString },
         genre: { type: GraphQLString },
+        authorId: { type: GraphQLID },
         author: {
             type: AuthorType,
             resolve(parent, args) {
                 //return authors.find(elem => elem.id === parent.authorID)
-                return Book.FindAll()
+                console.log(parent)
+                return Author.FindById(parent.authorID).then(result => {
+                    return result
+                })
             }
         }
     })
@@ -43,14 +47,18 @@ const BookType = new GraphQLObjectType({
 const AuthorType = new GraphQLObjectType({
     name: 'Author',
     fields: () => ({
-        id: { type: GraphQLID },
+        _id: { type: GraphQLID },
         name: { type: GraphQLString },
         age: { type: GraphQLInt },
         books: {
             type: GraphQLList(BookType),
             resolve(parent, args) {
                 //return books.filter(elem => elem.authorID === parent.id)
-                return Author.FindAll()
+                console.log("aqui rodou", parent, " e ", args)
+                return Book.FindByAuthor(parent._id).then(res => {
+                    console.log("O retorno foi ", res)
+                    return res
+                })
             }
 
         }
@@ -69,10 +77,8 @@ const RootQuery = new GraphQLObjectType({
                 // code to get data from db / other sources
                 //return client.db.collection("book").find
                 return Book.FindById(args.id).then(res => {
-                    console.log("aqui", res)
                     return res
                 })
-
             }
         },
         author: {
@@ -80,7 +86,10 @@ const RootQuery = new GraphQLObjectType({
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
 
-                return authors.find(elem => elem.id === args.id)
+                return Author.FindById(args.id).then(result => {
+                    return result
+                })
+                //return authors.find(elem => elem.id === args.id)
                 // code to get data from db / other sources
             }
         },
@@ -110,11 +119,13 @@ const Mutation = new GraphQLObjectType({
             type: AuthorType,
             args: {
                 name: { type: GraphQLString },
-                age: { type: GraphQLInt }
+                age: { type: GraphQLInt },
+                _id: { type: GraphQLID }
             },
             resolve(parent, args) {
                 author = { name: args.name, age: args.age }
                 return Author.insertAuthor(author).then(result => {
+                    console.log(result)
                     return result.ops[0]
                 })
             }

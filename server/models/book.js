@@ -1,6 +1,6 @@
 const client = require('../app')
 const assert = require('assert');
-
+const ObjectID = require('mongodb').ObjectID
 
 const insertDoc = async (data) => {
 
@@ -13,9 +13,21 @@ const insertDoc = async (data) => {
 
 const FindById = async (id) => {
     try {
-        return client.db.collection('book').findOne({ _id: id })
+        return await client.db.collection('book').findOne({ "_id": ObjectID(id) }).then(re => re)
     } catch (err) {
-        console.log(`Error ao procurar book: ${err}`)
+        console.log(`Error ao procurar Book: ${err}`)
+    }
+}
+
+const FindByAuthor = async (id) => {
+    try {
+        return await client.db.collection('book').findOne({ "authorId": "5eaddb77a2591944690dfe91" }).then(re => {
+            console.log("valor do id", typeof toString(id))
+            console.log("valor do re", re)
+            return re
+        })
+    } catch (err) {
+        console.log(`Error ao procurar Book: ${err}`)
     }
 }
 
@@ -41,6 +53,7 @@ const insertDoc = async (data) => {
 module.exports.insertBook = insertDoc;
 module.exports.FindById = FindById;
 module.exports.FindAll = FindAll;
+module.exports.FindByAuthor = FindByAuthor;
 
 /*
     Promisse é para decidir o que fazer depois que a funcao
