@@ -1,5 +1,7 @@
 const graphql = require('graphql')
 const Book = require('../models/book')
+const Author = require('../models/author')
+
 
 const {
     GraphQLObjectType,
@@ -31,8 +33,8 @@ const BookType = new GraphQLObjectType({
         author: {
             type: AuthorType,
             resolve(parent, args) {
-                console.log(parent)
-                return authors.find(elem => elem.id === parent.authorID)
+                //return authors.find(elem => elem.id === parent.authorID)
+                return Book.FindAll()
             }
         }
     })
@@ -47,7 +49,8 @@ const AuthorType = new GraphQLObjectType({
         books: {
             type: GraphQLList(BookType),
             resolve(parent, args) {
-                return books.filter(elem => elem.authorID === parent.id)
+                //return books.filter(elem => elem.authorID === parent.id)
+                return Author.FindAll()
             }
 
         }
@@ -62,8 +65,14 @@ const RootQuery = new GraphQLObjectType({
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
 
-                return books.find(elem => elem.id === args.id)
+                //return books.find(elem => elem.id === args.id)
                 // code to get data from db / other sources
+                //return client.db.collection("book").find
+                return Book.FindById(args.id).then(res => {
+                    console.log("aqui", res)
+                    return res
+                })
+
             }
         },
         author: {
@@ -100,9 +109,24 @@ const Mutation = new GraphQLObjectType({
                 age: { type: GraphQLInt }
             },
             resolve(parent, args) {
-                book = { name: args.name, age: args.age }
-                console.log(Book.insertBook(book))
-
+                author = { name: args.name, age: args.age }
+                return Author.insertAuthor(author).then(result => {
+                    return result.ops[0]
+                })
+            }
+        },
+        addBook: {
+            type: BookType,
+            args: {
+                name: { type: GraphQLString },
+                genre: { type: GraphQLString },
+                authorID: { type: GraphQLID }
+            },
+            resolve(parent, args) {
+                book = { name: args.name, genre: args.genre, authorId: args.authorID }
+                return Book.insertBook(book).then((result) => {
+                    return result.ops[0]
+                })
             }
         }
     }
