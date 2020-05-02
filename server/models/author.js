@@ -19,9 +19,12 @@ const FindById = async (id) => {
     }
 }
 
-const FindAll = async (id) => {
+const FindAll = async () => {
     try {
-        return client.db.collection('author').find({})
+        return await client.db.collection('author').find({}).toArray().then(resul => {
+            console.log("Roudou o retorno")
+            return resul
+        })
     } catch (err) {
         console.log(`Error ao procurar todos os Author: ${err}`)
     }

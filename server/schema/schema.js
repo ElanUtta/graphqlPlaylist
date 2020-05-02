@@ -87,13 +87,17 @@ const RootQuery = new GraphQLObjectType({
         books: {
             type: new GraphQLList(BookType),
             resolve(parent, args) {
-                return books
+                return Book.FindAll().then(result => {
+                    return result
+                })
             }
         },
         authors: {
-            type: new GraphQLList(BookType),
+            type: new GraphQLList(AuthorType),
             resolve(parent, args) {
-                return authors
+                return Author.FindAll().then(result => {
+                    return result
+                })
             }
         }
     }
